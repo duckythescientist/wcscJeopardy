@@ -1,0 +1,6 @@
+void hwInit()
+{
+  switchesInit();
+  lightsInit();
+  
+}
