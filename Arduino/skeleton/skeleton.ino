@@ -1,4 +1,4 @@
-#define DEBUG_ON 1
+#define DEBUG_ON 0
 #define DEBUG(x) if(DEBUG_ON) Serial.println(x)
 
 
@@ -10,6 +10,7 @@
 
 #define SENDACK Serial.println('A')
 #define RETRIES 3
+#define SERIALDELAY _delay_us(1000.0)
 
 void verify(void (*func)(void) );
 
@@ -25,7 +26,7 @@ void setup()
 
 void loop()
 {
-  
+  parseSerial();
 }
 
 

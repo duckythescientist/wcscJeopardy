@@ -1,3 +1,12 @@
+void clearSerial()
+{
+  while(Serial.available()>0)
+  {
+    Serial.read();
+    //_delay_us(1000);
+  }
+}
+
 void parseSerial()
 {
   if(Serial.available())
@@ -5,6 +14,7 @@ void parseSerial()
     char command = Serial.read();
     DEBUG("#SW");
     DEBUG(command);
+    SERIALDELAY;
     switch(command)
     {
       case '\n': //junk
@@ -12,6 +22,7 @@ void parseSerial()
       case 'S': //I done goofed on the protocol. Interpret S and C as same
       case 'C':
         char rw = Serial.read();
+        SERIALDELAY;
         DEBUG("#rw");
         DEBUG(rw);
         if(rw == '1')
@@ -40,7 +51,7 @@ void verify(void (*func)(void) )
     int success = 0;
     while(currTime + timeoutAck > millis() && !success)
     {
-      if(Serial.available() >2)
+      if(Serial.available())
       {
         if(Serial.find("A"))
         {

@@ -23,5 +23,6 @@ void getConfig() //assumes C1 has already been read
   {
     configList[i] = configListBuf[i];
   }
+  clearSerial();
   SENDACK;
 }
