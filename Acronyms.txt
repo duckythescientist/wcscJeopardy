@@ -1,0 +1,11 @@
+Acronyms
+GB
+What is Gigabytes?
+CPU
+What is Central Processing Unit?
+CD
+What is Compact Disc?
+RAM
+What is Random Access Memory?
+UPS
+What is Uninterruptible Power Supply?

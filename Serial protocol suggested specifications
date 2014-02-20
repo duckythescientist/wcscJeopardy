@@ -1,0 +1,86 @@
+Serial protocol suggested specifications
+Each call or response will be terminated by a newline
+Each call or response will begin with a single ASCII letter and possibly ASCII-encoded integers
+A more verbose protocol could be implemented, but this is chosen because of the memory limitations of the Arduino
+
+A successfully implemented call will be signaled by a response of "A" for Acknowledge
+
+Configuration:
+    "C0" read configuration values
+        receives packet matching config write
+        send ACK on receipt of values
+    "C1 [1] [2] [3] [4] [5] [6] [7]" write config values (also response to config read request)
+        [1] number of players (3)
+        [2] timeout in milliseconds after buzz-in (3000)
+        [3] lockout period in milliseconds for buzz-in before answer-enable (750)
+        [4] timeout for no response after answer-enable (4000)
+        [5]     bit0: enable verbose lights (1)
+                bit1: enable buzzer on answer-enable (1)
+                bit2: enable speaker on answer-enable (1)
+                bit3: allow second try answers (1)
+                bit4: allow third try answers (1)
+                bit4:7 future
+        [6] hardware (1) or software (0) control of answer-enable (default 0)
+            hardware control currently requires 3 or fewer players
+            I may add more buttons to the control panel, but we'll do them on a keyboard/monitor for now
+        [7] resend timeout on no response of ACK (50)
+
+Signaling:
+    "E" answer-Enable (sent by computer or implemented by button press of control unit)
+    "S [1]" Signaling event (sent by control unit)
+        [1] player number who buzzed in first
+    "R [1]" response to question (sent by computer)
+        [1] boolean value as to correctness of answer, will retrigger answer-Enable if configured for second/third try answers
+        will also trigger speaker/buzzer/light events
+        should be sent within timeout "C [2]" for best effect
+    "T [1]" timeout event (sent by control unit)
+        [1] type of timeout
+            1: timeout after buzz-in with no answer
+            2: timeout after answer-enable with no answer
+
+
+
+Example "gameplay" and <serial>
+control unit serial is indented
+
+<S0>
+    <S1 3 3000 750 4000 31 0 50>
+<A>
+<S1 3 3000 100 5000 31 0 50>
+    <A>
+"Hello everyone, Jeopardy time"
+"Player one, select a question"
+    "Acronyms for $100"
+"GB"
+<E>
+    <A>
+    <S 2>
+<A>
+"Player two"
+    "what is jiggo boots"
+"I'm sorry that is not correct"
+<R 0>
+    <A>
+    <S 1>
+<A>
+"Player one"
+    "Ummm....."
+    <T 1>
+<A>
+"Terribly sorry, out of time"
+"Player three, any guesses?"
+    <T 2>
+<A>
+"Alright, next question"
+    "Acronyms for $200, Alex"
+"CPU"
+<E>
+    <A>
+    <S 1>
+<A>
+"Player one, your answer"
+    "What is central processing unit"
+<R 1>
+    <A>
+"Very good, that is correct"
+"Pick again"
