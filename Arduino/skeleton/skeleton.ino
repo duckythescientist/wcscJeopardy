@@ -20,10 +20,6 @@ void setup()
 }
 
 
-
-
-
-
 void loop()
 {
   parseSerial();
