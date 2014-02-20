@@ -15,13 +15,14 @@ void parseSerial()
     DEBUG("#SW");
     DEBUG(command);
     SERIALDELAY;
+    char rw;
     switch(command)
     {
       case '\n': //junk
         break;
       case 'S': //I done goofed on the protocol. Interpret S and C as same
       case 'C':
-        char rw = Serial.read();
+        rw = Serial.read();
         SERIALDELAY;
         DEBUG("#rw");
         DEBUG(rw);
@@ -35,6 +36,12 @@ void parseSerial()
           verify(printConfig);//send the func pointer 
         }
         break;
+      case 'E':
+        //answer enable
+        DEBUG("Ans En");
+        getBuzzers();
+        break;
+     
     }
   }
 }
