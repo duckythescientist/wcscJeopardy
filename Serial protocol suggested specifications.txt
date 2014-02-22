@@ -11,8 +11,8 @@ Configuration:
         send ACK on receipt of values
     "C1 [1] [2] [3] [4] [5] [6] [7]" write config values (also response to config read request)
         [1] number of players (3)
-        [2] timeout in milliseconds after buzz-in (3000)
-        [3] lockout period in milliseconds for buzz-in before answer-enable (750)
+        [2] timeout in milliseconds after buzz-in (4000)
+        [3] lockout period in milliseconds for buzz-in before answer-enable (1000)
         [4] timeout for no response after answer-enable (4000)
         [5]     bit0: enable verbose lights (1)
                 bit1: enable buzzer on answer-enable (1)
@@ -20,7 +20,7 @@ Configuration:
                 bit3: allow second try answers (1)
                 bit4: allow third try answers (1)
                 bit4:7 future
-        [6] hardware (1) or software (0) control of answer-enable (default 0)
+        [6] hardware (1) or software (0) control of answer-enable (default 1)
             hardware control currently requires 3 or fewer players
             I may add more buttons to the control panel, but we'll do them on a keyboard/monitor for now
         [7] resend timeout on no response of ACK (50)
