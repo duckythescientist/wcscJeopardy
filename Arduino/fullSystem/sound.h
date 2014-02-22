@@ -1,0 +1,2 @@
+#define SPEAKERPIN 10
+#define SPEAKERENABLE 23

@@ -12,7 +12,7 @@ void parseSerial()
   char command;
   if(!(PINSW & SWAE)) //manually initiate an answer-enable condition
     goto answerenable; //I'm so sorry....
-    
+
   if(Serial.available())
   {
     command = Serial.read();
@@ -45,6 +45,7 @@ void parseSerial()
         //answer enable
         DEBUG("Ans En");
         getBuzzers();
+        
           for(int i=0; i<numPlayers; i++)
           {
             lightIdle(i);

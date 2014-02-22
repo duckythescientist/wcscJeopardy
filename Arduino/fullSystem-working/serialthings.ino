@@ -45,6 +45,7 @@ void parseSerial()
         //answer enable
         DEBUG("Ans En");
         getBuzzers();
+        delay(2000);
           for(int i=0; i<numPlayers; i++)
           {
             lightIdle(i);

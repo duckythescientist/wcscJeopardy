@@ -7,24 +7,37 @@ void sendBuzzIn()
 
 int getResponse()//0:no right answer yet,  1:right answer
 {
-  
+  DEBUG("getResponse");
   long currTime = millis();
   long nowTime;
-  int response;
-  while((nowTime = currTime + toBuzz) > millis() && !Serial.available() && !(response = (PINSW & responseMask)^responseMask))
+  byte response;
+  while(((currTime + toBuzz) > millis()) && !Serial.available() && !(response = (PINSW & responseMask)^responseMask))
   {
-    whiteBar(currAnswer, nowTime*255/toBuzz);
+    whiteBar(currAnswer-1, 255 - ((millis() - currTime) * 255 / toBuzz));
   }
+  DEBUG("check about response");
   if(!Serial.available() && !response)
   {
     verify(sendTimeoutNoResponse);
-    return 0;
+    while(!Serial.available() && !(response = (PINSW & responseMask)^responseMask))
+    {}; //wait for actual response
   }
+  Serial.read(); //expect 'R'
   SERIALDELAY;
   int correctness = Serial.available() ? Serial.parseInt() : (response & SWYES);
+  DEBUG("response");
+  DEBUG(response);
+  DEBUG("correctness");
+  DEBUG(correctness);
   SENDACK;
   if(!correctness)
-    redBar(currAnswer, 255);
+  {
+    redBar(currAnswer-1, 255);
+  }
+  else
+  {
+    greenBar(currAnswer-1, 255);
+  }
   return correctness;
     
   
@@ -50,14 +63,21 @@ void switchesInit()
     switchesMask |= playerListSwitches[i];
   }
   DEBUG(switchesMask);
-  //DDRSW &= ~(switchesMask | responseMask | SWAE);
-  //PORTSW |= switchesMask | responseMask | SWAE;
+  DDRSW &= ~(switchesMask | responseMask | SWAE);
+  PORTSW |= switchesMask | responseMask | SWAE;
+  
+  pinMode(SWENPIN, hwControl);
+  digitalWrite(SWENPIN, 0);
 }
 
 void clearAnswers()
 {
   currAnswer = 0;
   currMask = switchesMask;
+  for(int i=0; i<3; i++)
+  {
+    stillAlive[i] = 1;
+  }
 }
 
 void getBuzzers()
@@ -72,9 +92,11 @@ void getBuzzers()
   {
   int buzzedIn = 0;
   long currTime = millis();
-  while(currTime + timeoutAnswer > millis() && (buzzedIn = (PINSW & currMask) ^ currMask))
+  while((currTime + timeoutAnswer > millis()) && !(buzzedIn = (PINSW & currMask) ^ currMask))
   {}
   int whoBuzzed = 0;
+  DEBUG("buzzedIn");
+  DEBUG(buzzedIn);
   switch(buzzedIn)
   {
     case P1SW:
@@ -86,19 +108,23 @@ void getBuzzers()
     case P3SW:
       whoBuzzed = 3;
       break;
-    case P4SW:
-      whoBuzzed = 4;
-      break;
   }
   if(!whoBuzzed)
   {
+    for(int i=0; i<numPlayers; i++)
+          {
+            lightIdle(i);
+          }
     verify(sendTimeoutNoBuzz);
     return;
   }
   DEBUG("Buzz in:");
   DEBUG(whoBuzzed);
+  stillAlive[whoBuzzed-1] = 0;
   currAnswer = whoBuzzed;
-  currMask &= ~(playerListSwitches[whoBuzzed]);
+  currMask &= ~(playerListSwitches[whoBuzzed-1]);
+  DEBUG("currMask");
+  DEBUG(currMask);
   for(int i=0; i<numPlayers; i++)
   {
     lightIdle(i);
@@ -111,6 +137,11 @@ void getBuzzers()
     return;
   }
   //else, keep looking for answers
+  for(int i=0; i<numPlayers; i++)
+  {
+    if(stillAlive[i])
+      blueBar(i, 255);
+  }
   }
 }
 
